@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Loan> Loans => Set<Loan>();
+    public DbSet<Loans> Loans => Set<Loans>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -12,7 +12,7 @@ namespace Bank.Loan.Domain.Entities;
 /// Encapsula toda la lógica de negocio y reglas de dominio.
 /// No depende de ningún framework externo.
 /// </summary>
-public class Loan
+public class Loans
 {
     // ── Identidad ─────────────────────────────────────────────────────────
     public Guid Id { get; private set; }
@@ -38,19 +38,19 @@ public class Loan
     public void ClearDomainEvents() => _domainEvents.Clear();
 
     // Constructor privado — solo se crea via factory method
-    private Loan() { CustomerId = string.Empty; RequestedAmount = null!; }
+    private Loans() { CustomerId = string.Empty; RequestedAmount = null!; }
 
     // ── Factory Method ────────────────────────────────────────────────────
 
     /// <summary>Crea una nueva solicitud de préstamo.</summary>
-    public static Loan Create(string customerId, decimal amount, int termMonths)
+    public static Loans Create(string customerId, decimal amount, int termMonths)
     {
         if (string.IsNullOrWhiteSpace(customerId))
             throw new ArgumentException("El ID del cliente es requerido.", nameof(customerId));
         if (termMonths < 1 || termMonths > 360)
             throw new ArgumentException("El plazo debe estar entre 1 y 360 meses.", nameof(termMonths));
 
-        var loan = new Loan
+        var loan = new Loans
         {
             Id = Guid.NewGuid(),
             CustomerId = customerId,
