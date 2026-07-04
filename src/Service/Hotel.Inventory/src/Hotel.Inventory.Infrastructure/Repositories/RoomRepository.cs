@@ -24,6 +24,11 @@ public class RoomRepository(AppDbContext context) : IRoomRepository
             r => r.HotelId == hotelId && r.RoomType == roomType && !r.Availability.IsReserved,
             cancellationToken);
 
+    public async Task<Room?> GetByReservationIdAsync(Guid reservationId, CancellationToken cancellationToken = default)
+        => await context.Rooms.FirstOrDefaultAsync(
+            r => r.Availability.ReservationId == reservationId,
+            cancellationToken);
+
     public async Task AddAsync(Room room, CancellationToken cancellationToken = default)
     {
         await context.Rooms.AddAsync(room, cancellationToken);

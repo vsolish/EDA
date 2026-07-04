@@ -20,6 +20,13 @@ public interface IRoomRepository
     /// </summary>
     Task<Room?> FindAvailableRoomAsync(string hotelId, string roomType, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Busca la habitación bloqueada por una reserva dada. Es lo que usa
+    /// ReleaseRoomConsumer para poder liberarla sólo con el ReservationId
+    /// que trae el mensaje de compensación.
+    /// </summary>
+    Task<Room?> GetByReservationIdAsync(Guid reservationId, CancellationToken cancellationToken = default);
+
     Task AddAsync(Room room, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(Room room, CancellationToken cancellationToken = default);

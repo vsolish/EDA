@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit" Version="8.3.6" />
     <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Hotel.Reservations.Application\Hotel.Reservations.Application.csproj" />
     <ProjectReference Include="..\Hotel.Reservations.Infrastructure\Hotel.Reservations.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\Shared\Hotel.Shared\src\Hotel.Shared\Hotel.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

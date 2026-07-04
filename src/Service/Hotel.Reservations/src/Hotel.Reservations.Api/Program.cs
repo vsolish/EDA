@@ -1,5 +1,7 @@
 using FluentValidation;
+using Hotel.Reservations.Api.Consumers;
 using Hotel.Reservations.Api.Middleware;
+using Hotel.Reservations.Api.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Hotel.Reservations.Application.Commands.CreateReservation;
 using Hotel.Reservations.Domain.Interfaces;
@@ -19,6 +21,10 @@ builder.Services.Configure<DatabaseOptions>(
     builder.Configuration.GetSection("Database"));
 
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection("Redis"));
+
+// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
+// Descomentar junto con el bloque AddMassTransit de más abajo para reactivar la SAGA.
+// builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -49,26 +55,30 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMassTransit(x =>
-{
-    //x.AddConsumer<OrderCreatedConsumer>();
-    //x.AddConsumer<CreditCheckRequestConsumer>();
-    //x.AddConsumer<ManagerApprovalRequestConsumer>();
-    //x.AddConsumer<OrderRejectedConsumer>();
-
-    //x.UsingRabbitMq((context, cfg) =>
-    //{
-    //    cfg.Host(new Uri("rabbitmq://guest:guest@localhost:5672/"));
-    //    cfg.ReceiveEndpoint("customers-service", e =>
-    //    {
-    //        e.ConfigureConsumer<OrderCreatedConsumer>(context);
-    //        e.ConfigureConsumer<CreditCheckRequestConsumer>(context);
-    //        e.ConfigureConsumer<ManagerApprovalRequestConsumer>(context);
-    //        e.ConfigureConsumer<OrderRejectedConsumer>(context);
-    //    });
-    //});
-});
-builder.Services.AddMassTransitHostedService();
+// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
+// Descomentar para reactivar la SAGA (junto con el Configure<RabbitMqOptions> de más arriba).
+//builder.Services.AddMassTransit(x =>
+//{
+//    x.AddConsumer<ReservationConfirmedConsumer>();
+//    x.AddConsumer<ReservationRejectedConsumer>();
+//    x.AddConsumer<ReservationCancelledConsumer>();
+//
+//    x.AddSagaStateMachine<ReservationStateMachine, ReservationState>()
+//        .InMemoryRepository();
+//
+//    x.UsingRabbitMq((context, cfg) =>
+//    {
+//        var rabbitMqOptions = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+//        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.VirtualHost, h =>
+//        {
+//            h.Username(rabbitMqOptions.Username);
+//            h.Password(rabbitMqOptions.Password);
+//        });
+//
+//        cfg.ConfigureEndpoints(context);
+//    });
+//});
+//builder.Services.AddMassTransitHostedService();
 
 var app = builder.Build();
 
