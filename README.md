@@ -186,7 +186,7 @@ Cada uno expone Swagger en `/swagger` cuando corre en `Development`.
    { "hotelId": "H1", "roomType": "Doble", "roomNumber": "101", "pricePerNight": 150 }
    ```
 2. Crear la reserva (esto dispara la saga):
-   ```
+   ``` https://localhost:7060/swagger/index.html
    POST https://localhost:7060/api/Reservation
    {
      "customerId": "C1", "hotelId": "H1", "roomType": "Doble",
