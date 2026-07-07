@@ -22,9 +22,7 @@ builder.Services.Configure<DatabaseOptions>(
 
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection("Redis"));
 
-// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
-// Descomentar junto con el bloque AddMassTransit de más abajo para reactivar la SAGA.
-// builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -55,30 +53,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
-// Descomentar para reactivar la SAGA (junto con el Configure<RabbitMqOptions> de más arriba).
-//builder.Services.AddMassTransit(x =>
-//{
-//    x.AddConsumer<ReservationConfirmedConsumer>();
-//    x.AddConsumer<ReservationRejectedConsumer>();
-//    x.AddConsumer<ReservationCancelledConsumer>();
-//
-//    x.AddSagaStateMachine<ReservationStateMachine, ReservationState>()
-//        .InMemoryRepository();
-//
-//    x.UsingRabbitMq((context, cfg) =>
-//    {
-//        var rabbitMqOptions = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-//        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.VirtualHost, h =>
-//        {
-//            h.Username(rabbitMqOptions.Username);
-//            h.Password(rabbitMqOptions.Password);
-//        });
-//
-//        cfg.ConfigureEndpoints(context);
-//    });
-//});
-//builder.Services.AddMassTransitHostedService();
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<ReservationConfirmedConsumer>();
+    x.AddConsumer<ReservationRejectedConsumer>();
+    x.AddConsumer<ReservationCancelledConsumer>();
+
+    x.AddSagaStateMachine<ReservationStateMachine, ReservationState>()
+        .InMemoryRepository();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitMqOptions = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.VirtualHost, h =>
+        {
+            h.Username(rabbitMqOptions.Username);
+            h.Password(rabbitMqOptions.Password);
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 

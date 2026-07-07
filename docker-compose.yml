@@ -1,0 +1,21 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: hotel-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP - usado por las APIs .NET (MassTransit)
+      - "15672:15672" # UI de administracion: http://localhost:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: hotel
+      RABBITMQ_DEFAULT_PASS: Hotel123!
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  rabbitmq_data:

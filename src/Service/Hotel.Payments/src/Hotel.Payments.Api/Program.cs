@@ -15,9 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseOptions>(
     builder.Configuration.GetSection("Database"));
 
-// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
-// Descomentar junto con el bloque AddMassTransit de más abajo para reactivar el consumer.
-// builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
@@ -40,25 +38,22 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// RabbitMq/MassTransit deshabilitado temporalmente (requiere Docker/RabbitMQ corriendo).
-// Descomentar para reactivar el consumer (junto con el Configure<RabbitMqOptions> de más arriba).
-//builder.Services.AddMassTransit(x =>
-//{
-//    x.AddConsumer<ProcessPaymentConsumer>();
-//
-//    x.UsingRabbitMq((context, cfg) =>
-//    {
-//        var rabbitMqOptions = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-//        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.VirtualHost, h =>
-//        {
-//            h.Username(rabbitMqOptions.Username);
-//            h.Password(rabbitMqOptions.Password);
-//        });
-//
-//        cfg.ConfigureEndpoints(context);
-//    });
-//});
-//builder.Services.AddMassTransitHostedService();
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<ProcessPaymentConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitMqOptions = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.VirtualHost, h =>
+        {
+            h.Username(rabbitMqOptions.Username);
+            h.Password(rabbitMqOptions.Password);
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 
